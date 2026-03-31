@@ -9,4 +9,4 @@ if [[ ! -f backend/.env ]]; then
   cp backend/.env.example backend/.env
 fi
 
-exec docker compose up --build "$@"
+exec docker compose up --build -d "$@"

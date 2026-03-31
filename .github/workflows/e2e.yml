@@ -31,7 +31,7 @@ jobs:
       - name: Start the app
         run: |
           chmod +x run.sh
-          ./run.sh -d
+          ./run.sh
 
       - name: Wait for backend
         run: |
