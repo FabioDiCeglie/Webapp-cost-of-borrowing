@@ -10,7 +10,7 @@ flowchart TB
 
   subgraph Web["Web container (Nginx) :8080"]
     Nginx[nginx]
-    App[React app (static)]
+    App["React app (static)"]
     Nginx -->|"/" serves static| App
   end
 
