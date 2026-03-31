@@ -1,4 +1,6 @@
 import logging
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from datetime import date
 
 from fastapi import APIRouter, Depends, FastAPI, Response
@@ -13,7 +15,34 @@ from repositories.time_series_repository import TimeSeriesObservationRepository
 from services.cost_of_borrowing_households.schemas import IngestResponse, ObservationsResponse
 from services.cost_of_borrowing_households.service import CostOfBorrowingHouseholdsService
 
-app = FastAPI(title="Cost of borrowing API")
+engine = get_db_engine()
+postgres = PostgresRepository(engine)
+time_series_repo = TimeSeriesObservationRepository()
+provider = EcbPortalProvider()
+cost_of_borrowing_households_service = CostOfBorrowingHouseholdsService(provider, time_series_repo)
+
+api = APIRouter(prefix="/api/v1")
+
+logger = logging.getLogger("uvicorn.error")
+
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
+    postgres.ping()
+    init_schema()
+
+    # OK for this assignment/demo. In production, ingestion usually runs as a scheduled job/worker and the API stays stateless.
+    try:
+        with Session(engine) as db:
+            ingested = cost_of_borrowing_households_service.ingest(db)
+        logger.info("Ingested %s observations on startup", ingested)
+    except Exception:
+        logger.exception("Startup ingest failed; continuing without ingest")
+
+    yield
+
+
+app = FastAPI(title="Cost of borrowing API", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -26,33 +55,6 @@ app.add_middleware(
     allow_methods=["GET", "POST"],
     allow_headers=["*"],
 )
-
-engine = get_db_engine()
-postgres = PostgresRepository(engine)
-time_series_repo = TimeSeriesObservationRepository()
-provider = EcbPortalProvider()
-cost_of_borrowing_households_service = CostOfBorrowingHouseholdsService(provider, time_series_repo)
-
-api = APIRouter(prefix="/api/v1")
-
-# Use Uvicorn's logger so messages show up in container logs by default.
-logger = logging.getLogger("uvicorn.error")
-
-
-@app.on_event("startup")
-def startup() -> None:
-    # Fail fast if DB is unreachable/misconfigured.
-    postgres.ping()
-    init_schema()
-
-    # OK for this assignment/demo. In production, ingestion usually runs as a scheduled job/worker and the API stays stateless.
-    try:
-        with Session(engine) as db:
-            ingested = cost_of_borrowing_households_service.ingest(db)
-        logger.info("Ingested %s observations on startup", ingested)
-    except Exception:
-        # Do not prevent the app from starting if the ECB API is temporarily unavailable.
-        logger.exception("Startup ingest failed; continuing without ingest")
 
 
 @api.get("/health", status_code=204)
