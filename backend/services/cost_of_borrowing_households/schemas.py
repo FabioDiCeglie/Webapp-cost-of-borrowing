@@ -8,7 +8,7 @@ class IngestResponse(BaseModel):
     ingested: int = Field(ge=0)
 
 
-class ObservationOut(BaseModel):
+class ObservationsResponse(BaseModel):
     period_date: date
     value: Decimal
 

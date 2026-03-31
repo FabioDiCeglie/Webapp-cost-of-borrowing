@@ -10,7 +10,7 @@ from domain.time_series import TimeSeriesObservation
 from infrastructure.db.models import TimeSeriesObservationModel
 
 
-class TimeSeriesRepository:
+class TimeSeriesObservationRepository:
     def upsert_observations(self, db: Session, observations: list[TimeSeriesObservation]) -> int:
         if not observations:
             return 0
@@ -26,7 +26,7 @@ class TimeSeriesRepository:
         db.commit()
         return len(observations)
 
-    def list_observations(
+    def get_observations(
         self,
         db: Session,
         *,
