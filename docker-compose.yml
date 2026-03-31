@@ -18,11 +18,17 @@ services:
       context: ./backend
     env_file:
       - ./backend/.env
-    ports:
-      - "8000:8000"
     depends_on:
       db:
         condition: service_healthy
+
+  web:
+    build:
+      context: ./front-end
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
 
 volumes:
   pgdata:
