@@ -46,4 +46,3 @@ def list_observations(
 ) -> list[ObservationsResponse]:
     observations = cost_of_borrowing_households_service.get_observations(db, start=start, end=end)
     return [ObservationsResponse(period_date=o.period_date, value=o.value) for o in observations]
-
