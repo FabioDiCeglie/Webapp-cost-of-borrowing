@@ -4,7 +4,7 @@ from decimal import Decimal
 
 
 @dataclass(frozen=True)
-class BorrowingCost:
+class TimeSeriesObservation:
     period_date: date
     value: Decimal
 
