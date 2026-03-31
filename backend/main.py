@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Response
 from sqlalchemy import text
 
-from infrastructure.db.engine import get_db_engine
+from infrastructure.db.engine import get_db_engine, init_schema
 
 app = FastAPI(title="Cost of borrowing API")
 
@@ -13,6 +13,7 @@ def startup() -> None:
     # Fail fast if DB is unreachable/misconfigured.
     with engine.connect() as conn:
         conn.execute(text("SELECT 1"))
+    init_schema()
 
 
 @app.get("/health", status_code=204)
