@@ -11,6 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Create backend .env for compose
+        run: cp backend/.env.example backend/.env
       - name: Start the app
         run: docker compose up --build -d
 
