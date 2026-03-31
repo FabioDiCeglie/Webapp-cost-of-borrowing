@@ -1,0 +1,40 @@
+name: E2E
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Start the app
+        run: docker compose up --build -d
+
+      - name: Wait for backend
+        run: |
+          HEALTH_URL="http://localhost:8080/api/v1/health"
+          for i in $(seq 1 120); do
+            if curl -s -o /dev/null -w "%{http_code}" "$HEALTH_URL" | grep -q 204; then
+              echo "Backend ready"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Backend did not become ready"
+          docker compose logs backend
+          exit 1
+
+      - name: Install test dependencies
+        run: pip install requests
+
+      - name: Run E2E tests
+        run: python backend/tests/e2e.py
+
+      - name: Stop the app
+        if: always()
+        run: docker compose down -v --remove-orphans
+

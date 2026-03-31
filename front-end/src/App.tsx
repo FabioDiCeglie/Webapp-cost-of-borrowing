@@ -6,10 +6,8 @@ import { Line } from 'react-chartjs-2'
 import { buildChartData, CHART_OPTIONS } from './chart/costOfBorrowingChart'
 import { useObservations } from './hooks/useObservations'
 
-type DateRange = { start: string; end: string }
-
 function App() {
-  const [range, setRange] = useState<DateRange>({
+  const [range, setRange] = useState<{ start: string; end: string }>({
     start: '2022-01-01',
     end: format(new Date(), 'yyyy-MM-dd'),
   })
