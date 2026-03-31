@@ -1,6 +1,6 @@
 from datetime import date
 
-from fastapi import Depends, FastAPI, Response
+from fastapi import APIRouter, Depends, FastAPI, Response
 from sqlalchemy.orm import Session
 from starlette.middleware.cors import CORSMiddleware
 
@@ -31,6 +31,8 @@ time_series_repo = TimeSeriesObservationRepository()
 provider = EcbPortalProvider()
 cost_of_borrowing_households_service = CostOfBorrowingHouseholdsService(provider, time_series_repo)
 
+api = APIRouter(prefix="/api/v1")
+
 
 @app.on_event("startup")
 def startup() -> None:
@@ -39,18 +41,18 @@ def startup() -> None:
     init_schema()
 
 
-@app.get("/health", status_code=204)
+@api.get("/health", status_code=204)
 def health() -> Response:
     return Response(status_code=204)
 
 
-@app.post("/ingest", response_model=IngestResponse)
+@api.post("/ingest", response_model=IngestResponse)
 def ingest(db: Session = Depends(get_db)) -> IngestResponse:
     ingested = cost_of_borrowing_households_service.ingest(db)
     return IngestResponse(ingested=ingested)
 
 
-@app.get("/observations", response_model=list[ObservationsResponse])
+@api.get("/observations", response_model=list[ObservationsResponse])
 def list_observations(
     start: date | None = None,
     end: date | None = None,
@@ -58,3 +60,6 @@ def list_observations(
 ) -> list[ObservationsResponse]:
     observations = cost_of_borrowing_households_service.get_observations(db, start=start, end=end)
     return [ObservationsResponse(period_date=o.period_date, value=o.value) for o in observations]
+
+
+app.include_router(api)
