@@ -2,6 +2,7 @@ from datetime import date
 
 from fastapi import Depends, FastAPI, Response
 from sqlalchemy.orm import Session
+from starlette.middleware.cors import CORSMiddleware
 
 from adapters.ecb_portal_provider import EcbPortalProvider
 from infrastructure.db.engine import get_db_engine, init_schema
@@ -12,6 +13,17 @@ from services.cost_of_borrowing_households.schemas import IngestResponse, Observ
 from services.cost_of_borrowing_households.service import CostOfBorrowingHouseholdsService
 
 app = FastAPI(title="Cost of borrowing API")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://localhost:3000",
+    ],
+    allow_credentials=True,
+    allow_methods=["GET", "POST"],
+    allow_headers=["*"],
+)
 
 engine = get_db_engine()
 postgres = PostgresRepository(engine)
