@@ -31,16 +31,14 @@ flowchart TB
 
 ### Build & run
 
-**Prerequisites**: Docker + Docker Compose.
-
-From the repo root:
+You need **Docker** (with Compose). From the repo root:
 
 ```bash
-cp backend/.env.example backend/.env
-docker compose up --build
+chmod +x run.sh
+./run.sh
 ```
 
-Open the app at `http://localhost:8080`.
+Open **http://localhost:8080**.
 
 ### Creative choices
 
