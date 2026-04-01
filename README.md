@@ -40,9 +40,10 @@ chmod +x run.sh
 
 Open **http://localhost:8080**.
 
-### Video example
+### Demo
 
-https://github.com/user-attachments/assets/2ad954c2-f2e9-4c73-bac5-341991b1eece
+https://github.com/user-attachments/assets/4edf90b0-d047-4a07-a07b-45029fc7b4b0
+
  
 ### Creative choices
 
