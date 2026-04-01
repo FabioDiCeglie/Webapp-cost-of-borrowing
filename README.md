@@ -42,7 +42,7 @@ Open **http://localhost:8080**.
 
 ### Creative choices
 
-- **Hexagonal backend (ports & adapters)**: the core use case (`CostOfBorrowingHouseholdsService`) depends on a provider port (`TimeSeriesProvider`) and a repository, so switching the ECB source or persistence strategy is isolated to adapters.
+- **Hexagonal backend (ports & adapters)**: `CostOfBorrowingHouseholdsService` is the application use case—it orchestrates what needs to happen (fetch from the provider, upsert into the DB, read series for the API) while depending only on a provider port (`TimeSeriesProvider`) and a repository, so switching the ECB source or persistence strategy stays in adapters.
 - **ECB provider behind an interface**: we use the ECB Data Portal JSON endpoint (the same one powering their charts) behind `EcbPortalProvider`, to keep the HTTP/parsing concerns out of the service layer.
 - **Nginx as the single entrypoint**: the browser only talks to Nginx (`/` for the React app, `/api/v1/*` proxied to FastAPI). This avoids CORS complexity and mirrors a common production setup.
 - **Tests at two levels**:
@@ -62,6 +62,8 @@ Open **http://localhost:8080**.
 
 All endpoints are versioned under `/api/v1` and are reachable through Nginx:
 
+- **Docs (OpenAPI/Swagger)**: `http://localhost:8080/api/v1/docs` (spec: `http://localhost:8080/api/v1/openapi.json`)
+
 - **Health**
 
 ```bash
@@ -74,10 +76,25 @@ curl -i http://localhost:8080/api/v1/health
 curl -sS -X POST http://localhost:8080/api/v1/ingest
 ```
 
+Example response:
+
+```json
+{ "ingested": 123 }
+```
+
 - **Read observations**
 
 ```bash
 curl -sS "http://localhost:8080/api/v1/observations?start=2022-01-01&end=2026-01-01" | head
+```
+
+Example response:
+
+```json
+[
+  { "period_date": "2022-01-01", "value": "1.23" },
+  { "period_date": "2022-02-01", "value": "1.27" }
+]
 ```
 
 ### Tests

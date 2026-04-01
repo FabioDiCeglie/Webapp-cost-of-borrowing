@@ -42,7 +42,12 @@ async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
     yield
 
 
-app = FastAPI(title="Cost of borrowing API", lifespan=lifespan)
+app = FastAPI(
+    title="Cost of borrowing API",
+    lifespan=lifespan,
+    openapi_url="/api/v1/openapi.json",
+    docs_url="/api/v1/docs",
+)
 
 app.add_middleware(
     CORSMiddleware,
