@@ -40,6 +40,10 @@ chmod +x run.sh
 
 Open **http://localhost:8080**.
 
+### Video example
+
+
+
 ### Creative choices
 
 - **Hexagonal backend (ports & adapters)**: `CostOfBorrowingHouseholdsService` is the application use case—it orchestrates what needs to happen (fetch from the provider, upsert into the DB, read series for the API) while depending only on a provider port (`TimeSeriesProvider`) and a repository, so switching the ECB source or persistence strategy stays in adapters.
