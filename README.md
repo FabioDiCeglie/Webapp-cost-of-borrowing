@@ -42,8 +42,8 @@ Open **http://localhost:8080**.
 
 ### Video example
 
-
-
+https://github.com/user-attachments/assets/2ad954c2-f2e9-4c73-bac5-341991b1eece
+ 
 ### Creative choices
 
 - **Hexagonal backend (ports & adapters)**: `CostOfBorrowingHouseholdsService` is the application use case—it orchestrates what needs to happen (fetch from the provider, upsert into the DB, read series for the API) while depending only on a provider port (`TimeSeriesProvider`) and a repository, so switching the ECB source or persistence strategy stays in adapters.
